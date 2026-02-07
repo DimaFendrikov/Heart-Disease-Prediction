@@ -22,29 +22,29 @@ This dataset consists of 1190 instances with 11 features. These datasets were co
 The notebook groups features into numeric and categorical sets for preprocessing.
 
 ### Numeric features
-- `age` — Age (years);
-- `resting bp s` — Resting systolic blood pressure (mm Hg);
-- `cholesterol` — Serum cholesterol (mg/dl);
-- `max heart rate` — Maximum heart rate achieved;
-- `oldpeak` — ST depression induced by exercise relative to rest.
+- `age` - Age (years);
+- `resting bp s` - Resting systolic blood pressure (mm Hg);
+- `cholesterol` - Serum cholesterol (mg/dl);
+- `max heart rate` - Maximum heart rate achieved;
+- `oldpeak` - ST depression induced by exercise relative to rest.
 
 ### Categorical / nominal features (with codes)
 - `chest pain type`:
-  - 1 — Typical angina;
-  - 2 — Atypical angina;
-  - 3 — Non-anginal pain;
-  - 4 — Asymptomatic;
+  - 1 - Typical angina;
+  - 2 - Atypical angina;
+  - 3 - Non-anginal pain;
+  - 4 - Asymptomatic;
 - `fasting blood sugar` (fasting blood sugar > 120 mg/dl):
-  - 1 — True;
-  - 0 — False;
+  - 1 - True;
+  - 0 - False;
 - `resting ecg`:
-  - 0 — Normal;
-  - 1 — ST-T wave abnormality (T wave inversions and/or ST elevation/depression > 0.05 mV);
-  - 2 — Probable/definite left ventricular hypertrophy (Estes’ criteria);
+  - 0 - Normal;
+  - 1 - ST-T wave abnormality (T wave inversions and/or ST elevation/depression > 0.05 mV);
+  - 2 - Probable/definite left ventricular hypertrophy (Estes’ criteria);
 - `ST slope`:
-  - 1 — Upsloping;
-  - 2 — Flat;
-  - 3 — Downsloping;
+  - 1 - Upsloping;
+  - 2 - Flat;
+  - 3 - Downsloping;
 - `sex`, `exercise angina` (binary indicators; see notebook for details).
 - `target`:
   - 1 - heart disease;
