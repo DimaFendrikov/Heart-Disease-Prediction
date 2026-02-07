@@ -23,6 +23,9 @@ Source (Kaggle): https://www.kaggle.com/datasets/mexwell/heart-disease-dataset/d
 
 Download and place the CSV file into this folder (e.g., `data/... .csv`) and update the path in the notebook if needed.
 
+## Install dependencies:
+```pip install -r requirements.txt```
+
 ## About Dataset
 This heart disease dataset is curated by combining 5 popular heart disease datasets already available independently but not combined before. In this dataset, 5 heart datasets are combined over 11 common features which makes it the largest heart disease dataset available so far for research purposes.
 The five datasets used for its curation are:
