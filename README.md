@@ -114,17 +114,47 @@ These values are converted to `NaN`. After that, I evaluate three strategies:
 The flag strategy is useful because “missingness / invalid measurement” can carry information and the model can learn it explicitly.
 All of this is handled inside the Pipeline to prevent leakage.
 
-## Results (test set)
-Final comparison on a held-out test set:
-- **Random Forest** achieved better ranking performance (higher ROC-AUC / PR-AUC);
-- **XGBoost** achieved slightly better fixed-threshold classification (higher F1 and fewer mistakes in the confusion matrix);
-- Logistic Regression provided a strong interpretable baseline.
+## Results (hold-out test set)
 
-**Metrics:**
-- Logistic Regression: ROC-AUC = **0.9305**, PR-AUC = **0.9304**, F1 = **0.8819**  
-- Random Forest: ROC-AUC = **0.9706**, PR-AUC = **0.9677**, F1 = **0.9319**  
-- XGBoost: ROC-AUC = **0.9574**, PR-AUC = **0.9549**, F1 = **0.9396**
-  
-**Screenshots:**
+Below are the final results on a **held-out test set** (after model selection on the training set).  
+I report both:
+- **ROC-AUC / PR-AUC** — threshold-independent ranking quality;
+- **F1 + confusion matrix** — decision quality at a fixed threshold.
+
+### Summary
+- **Random Forest** shows the strongest ranking performance (highest ROC-AUC / PR-AUC);
+- **XGBoost** achieves the best fixed-threshold classification (highest F1);
+- **Logistic Regression** is a strong, interpretable baseline.
+
+### Metrics
+| Model | ROC-AUC | PR-AUC | F1 |
+|------:|:------:|:------:|:--:|
+| Logistic Regression | **0.9305** | **0.9304** | **0.8819** |
+| Random Forest | **0.9706** | **0.9677** | **0.9319** |
+| XGBoost | **0.9574** | **0.9549** | **0.9396** |
+
+**Final choice:** **XGBoost**, because I prioritize fewer misclassifications at a fixed threshold (best F1 in this comparison).
+
+### Visuals
+**ROC / PR curves**
+![ROC and PR curves](Data/ROC-PR-results.png)
+
+**Logistic Regression — classification report / confusion matrix**
+<table>
+  <tr>
+    <td align="center">
+      <img src="Data/LogReg_results.png" width="300" alt="Logistic Regression results" /><br/>
+      <b>Logistic Regression</b>
+    </td>
+    <td align="center">
+      <img src="Data/RandomForest_results.png" width="300" alt="Random Forest results" /><br/>
+      <b>Random Forest</b>
+    </td>
+    <td align="center">
+      <img src="Data/XGBoost_results.png" width="300" alt="XGBoost results" /><br/>
+      <b>XGBoost</b>
+    </td>
+  </tr>
+</table>
 
 **Final choice:** XGBoost, because in this scenario I prioritize accurate healthy vs. diseased decisions at a fixed threshold (higher F1 and fewer errors).
