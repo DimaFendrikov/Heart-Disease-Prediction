@@ -3,6 +3,21 @@
 A reproducible end-to-end machine learning workflow for predicting heart disease from tabular clinical features.  
 This project focuses on correct data handling (including invalid values), leakage-safe preprocessing with scikit-learn Pipelines, model comparison, and final evaluation.
 
+## Problem and why this work is useful
+Heart disease prediction is a classic tabular binary classification task: the input is a set of clinical measurements, and the target is whether heart disease is present.  
+The main difficulty in this kind of data is often not “choosing a model”, but building an evaluation pipeline that stays correct under real-world data issues.
+
+This dataset contains values that are physiologically implausible (for example `cholesterol = 0`, `resting bp s = 0`, `oldpeak < 0`). If such values are treated as valid numbers, models can learn patterns that are artifacts of data quality rather than clinical signal.  
+Another frequent issue in ML case studies is **data leakage**: preprocessing is fit on the full dataset (or outside cross-validation), which inflates metrics and makes results unreliable.
+
+The practical value of this project is a clean, reproducible workflow that demonstrates:
+- How to detect invalid measurements and handle them consistently;
+- How to compare different data-quality strategies (drop vs impute vs impute+flags) using the same protocol;
+- How to build a leakage-safe `Pipeline` so that all preprocessing is fit only on training folds;
+- How to compare multiple models fairly and then confirm performance on a held-out test set.
+
+This is an educational ML case study: the goal is to demonstrate correct ML practice on tabular data, not to provide a clinical diagnostic tool.
+
 ## Dataset
 Source (Kaggle): https://www.kaggle.com/datasets/mexwell/heart-disease-dataset/data
 
@@ -50,6 +65,21 @@ The notebook groups features into numeric and categorical sets for preprocessing
 - `target`:
   - 1 - heart disease;
   - 0 - no heart disease.
+  
+## Experiment design (how evaluation is kept honest)
+To make the comparison reliable, the workflow follows two rules:
+
+1) **Leakage-safe preprocessing**  
+All transformations (invalid-value handling, imputation, scaling, one-hot encoding) are applied inside a scikit-learn `Pipeline`.  
+This ensures that during cross-validation each fold fits preprocessing only on the training split, not on validation data.
+
+2) **Two-stage evaluation**  
+- **Model/strategy selection** is done with Stratified K-Fold cross-validation on the training set (using ROC-AUC, PR-AUC, and F1);  
+- **Final reporting** is done on a separate held-out test set to avoid optimistic bias.
+
+This setup allows a fair comparison between:
+- Data-quality strategies (`DROP`, `IMPUTE_MEDIAN`, `IMPUTE+FLAGS`);
+- Models (LogReg, Random Forest, XGBoost).
     
 ## Work done (project workflow)
 - Exploratory Data Analysis (EDA): distributions, class balance, basic correlation analysis;
@@ -67,13 +97,22 @@ The notebook groups features into numeric and categorical sets for preprocessing
   - Precision/Recall/F1, confusion matrix, and classification report (threshold-dependent classification quality).
 
 ## Data quality handling (invalid values)
-Some values are physiologically implausible and were treated as invalid measurements:
+The dataset contains measurements that are implausible in practice and were treated as invalid:
 - `cholesterol = 0`;
 - `resting bp s = 0`;
 - `oldpeak < 0`.
 
-These values are converted to `NaN` and handled inside the Pipeline.  
-Doing this inside the Pipeline prevents data leakage: imputation/scaling/encoding are fitted only on training folds during CV.
+These values are converted to `NaN`. After that, I evaluate three strategies:
+
+- `DROP` — remove rows that contain invalid values in these fields;
+- `IMPUTE_MEDIAN` — keep rows, convert invalid values to `NaN`, then impute numeric features with median;
+- `IMPUTE+FLAGS` — same as imputation, but add indicator flags:
+  - `cholesterol_missing`;
+  - `resting_bp_missing`;
+  - `oldpeak_invalid`.
+
+The flag strategy is useful because “missingness / invalid measurement” can carry information and the model can learn it explicitly.
+All of this is handled inside the Pipeline to prevent leakage.
 
 ## Results (test set)
 Final comparison on a held-out test set:
@@ -85,5 +124,7 @@ Final comparison on a held-out test set:
 - Logistic Regression: ROC-AUC = **0.9305**, PR-AUC = **0.9304**, F1 = **0.8819**  
 - Random Forest: ROC-AUC = **0.9706**, PR-AUC = **0.9677**, F1 = **0.9319**  
 - XGBoost: ROC-AUC = **0.9574**, PR-AUC = **0.9549**, F1 = **0.9396**
+  
+**Screenshots:**
 
 **Final choice:** XGBoost, because in this scenario I prioritize accurate healthy vs. diseased decisions at a fixed threshold (higher F1 and fewer errors).
