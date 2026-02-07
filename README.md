@@ -1,89 +1,29 @@
-# Heart Disease Prediction — ML Case Study (Leakage-Safe Pipeline)
+## Problem statement: why this work exists and what it is useful for
 
-A reproducible end-to-end machine learning workflow for predicting heart disease from tabular clinical features.  
-This project focuses on correct data handling (including invalid values), leakage-safe preprocessing with scikit-learn Pipelines, model comparison, and final evaluation.
+Predicting heart disease from basic clinical measurements is a typical real-world classification task on tabular data: there is a binary target, mixed feature types (numeric + categorical), and the results are evaluated not only by “accuracy”, but by metrics that reflect ranking quality and decision quality at a fixed threshold.
 
-## Dataset
-Source (Kaggle): https://www.kaggle.com/datasets/mexwell/heart-disease-dataset/data
+However, the main difficulty in such tasks is often not the choice of a model, but **the correctness of the workflow**. In practice, tabular medical-like datasets contain measurement issues: missing values, invalid values, inconsistent coding, and artifacts that can silently distort evaluation. A common mistake in ML projects is to “clean and transform everything first” and only then run cross-validation. This can lead to **data leakage**, where preprocessing learns information from the full dataset (including validation folds) and inflates metrics.
 
-Download and place the CSV file into this folder (e.g., `data/... .csv`) and update the path in the notebook if needed.
+This project is useful as a **clean, reproducible reference** for how to do a tabular classification pipeline correctly:
+- how to detect and handle invalid/impossible values (e.g., `cholesterol = 0`, `resting bp s = 0`, `oldpeak < 0`);
+- how to compare different data-quality handling strategies in a measurable way, not “by intuition”;
+- how to build an end-to-end **leakage-safe** preprocessing and modeling workflow using `ColumnTransformer + Pipeline`;
+- how to compare models under stratified cross-validation and then validate the final choice on a held-out test set.
 
-## About Dataset
-This heart disease dataset is curated by combining 5 popular heart disease datasets already available independently but not combined before. In this dataset, 5 heart datasets are combined over 11 common features which makes it the largest heart disease dataset available so far for research purposes.
-The five datasets used for its curation are:
-- Cleveland
-- Hungarian
-- Switzerland
-- Long Beach VA
-- Statlog (Heart) Data Set.
+In other words, the practical value of the work is not that it “solves medicine”, but that it demonstrates solid engineering thinking in ML:
+the model is evaluated honestly, preprocessing is not leaking information, and the approach is structured so that it can be reused for other tabular classification problems (finance, operations, risk scoring, churn, etc.) where data quality issues are common.
 
-This dataset consists of 1190 instances with 11 features. These datasets were collected and combined at one place to help advance research on CAD-related machine learning and data mining algorithms, and hopefully to ultimately advance clinical diagnosis and early treatment.
+### What exactly is studied in this notebook
+The notebook focuses on one core question:
+**How do data-quality decisions affect model performance and reliability?**
 
-## Features used (data dictionary)
-The notebook groups features into numeric and categorical sets for preprocessing.
+To answer it, I compare multiple strategies for handling invalid measurements:
+- dropping corrupted rows (`DROP`);
+- converting invalid values to `NaN` and imputing (`IMPUTE_MEDIAN`);
+- imputing while also adding indicator flags (`IMPUTE+FLAGS`), so the model can learn that a value was missing/invalid.
 
-### Numeric features
-- `age` - Age (years);
-- `resting bp s` - Resting systolic blood pressure (mm Hg);
-- `cholesterol` - Serum cholesterol (mg/dl);
-- `max heart rate` - Maximum heart rate achieved;
-- `oldpeak` - ST depression induced by exercise relative to rest.
+This is evaluated consistently using the same leakage-safe pipeline and the same CV protocol across models (Logistic Regression, Random Forest, XGBoost), and then validated on a separate test set.
 
-### Categorical / nominal features (with codes)
-- `chest pain type`:
-  - 1 - Typical angina;
-  - 2 - Atypical angina;
-  - 3 - Non-anginal pain;
-  - 4 - Asymptomatic;
-- `fasting blood sugar` (fasting blood sugar > 120 mg/dl):
-  - 1 - True;
-  - 0 - False;
-- `resting ecg`:
-  - 0 - Normal;
-  - 1 - ST-T wave abnormality (T wave inversions and/or ST elevation/depression > 0.05 mV);
-  - 2 - Probable/definite left ventricular hypertrophy (Estes’ criteria);
-- `ST slope`:
-  - 1 - Upsloping;
-  - 2 - Flat;
-  - 3 - Downsloping;
-- `sex`, `exercise angina` (binary indicators; see notebook for details).
-- `target`:
-  - 1 - heart disease;
-  - 0 - no heart disease.
-    
-## Work done (project workflow)
-- Exploratory Data Analysis (EDA): distributions, class balance, basic correlation analysis;
-- Data quality checks and handling of invalid/impossible values;
-- Leakage-safe preprocessing using `ColumnTransformer + Pipeline`:
-  - Numeric: median imputation + standard scaling;
-  - Categorical: most-frequent imputation + one-hot encoding;
-- Model training and comparison:
-  - Logistic Regression (baseline);
-  - Random Forest;
-  - XGBoost;
-- Hyperparameter tuning via cross-validation (train only);
-- Final evaluation on a held-out test set:
-  - ROC-AUC and PR-AUC (threshold-independent ranking quality);
-  - Precision/Recall/F1, confusion matrix, and classification report (threshold-dependent classification quality).
-
-## Data quality handling (invalid values)
-Some values are physiologically implausible and were treated as invalid measurements:
-- `cholesterol = 0`;
-- `resting bp s = 0`;
-- `oldpeak < 0`.
-
-These values are converted to `NaN` and handled inside the Pipeline.  
-Doing this inside the Pipeline prevents data leakage: imputation/scaling/encoding are fitted only on training folds during CV.
-
-## Results (test set)
-Final comparison on a held-out test set:
-- **Random Forest** achieved better ranking performance (higher ROC-AUC / PR-AUC);
-- **XGBoost** achieved slightly better fixed-threshold classification (higher F1 and fewer mistakes in the confusion matrix);
-- Logistic Regression provided a strong interpretable baseline.
-
-**Metrics:**
-- Logistic Regression: ROC-AUC = **0.9305**, PR-AUC = **0.9304**, F1 = **0.8819**  
-- Random Forest: ROC-AUC = **0.9706**, PR-AUC = **0.9677**, F1 = **0.9319**  
-- XGBoost: ROC-AUC = **0.9574**, PR-AUC = **0.9549**, F1 = **0.9396**
-
-**Final choice:** XGBoost, because in this scenario I prioritize accurate healthy vs. diseased decisions at a fixed threshold (higher F1 and fewer errors).
+### Important note about scope
+This is an educational ML case study.  
+The goal is to demonstrate a correct and reproducible ML workflow, not to provide a clinical diagnostic tool.
