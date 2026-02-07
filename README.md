@@ -5,6 +5,7 @@ This project focuses on correct data handling (including invalid values), leakag
 
 ## Dataset
 Source (Kaggle): https://www.kaggle.com/datasets/mexwell/heart-disease-dataset/data
+
 Download and place the CSV file into this folder (e.g., `data/... .csv`) and update the path in the notebook if needed.
 
 ## About Dataset
