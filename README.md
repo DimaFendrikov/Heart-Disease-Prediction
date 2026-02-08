@@ -141,21 +141,21 @@ I report both:
 
 ### Visuals
 **ROC / PR curves**
-![ROC and PR curves](Data/ROC-PR-results.png)
+![ROC and PR curves](data/ROC-PR-results.png)
 
 **Logistic Regression — classification report / confusion matrix**
 <table>
   <tr>
     <td align="center">
-      <img src="Data/LogReg_results.png" width="300" alt="Logistic Regression results" /><br/>
+      <img src="data/LogReg_results.png" width="300" alt="Logistic Regression results" /><br/>
       <b>Logistic Regression</b>
     </td>
     <td align="center">
-      <img src="Data/RandomForest_results.png" width="300" alt="Random Forest results" /><br/>
+      <img src="data/RandomForest_results.png" width="300" alt="Random Forest results" /><br/>
       <b>Random Forest</b>
     </td>
     <td align="center">
-      <img src="Data/XGBoost_results.png" width="300" alt="XGBoost results" /><br/>
+      <img src="data/XGBoost_results.png" width="300" alt="XGBoost results" /><br/>
       <b>XGBoost</b>
     </td>
   </tr>
