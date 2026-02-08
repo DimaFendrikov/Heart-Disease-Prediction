@@ -6,4 +6,8 @@ scikit-learn==1.6.1
 xgboost==3.0.2
 joblib==1.4.2
 tqdm==4.67.1
+<<<<<<< HEAD
 jupyter==1.1.1
+=======
+jupyter==1.1.1
+>>>>>>> b4bcc432e453c58dd9f6cee23f8a118d6c3e8e60
